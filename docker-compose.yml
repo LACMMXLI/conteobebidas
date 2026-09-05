@@ -1,0 +1,55 @@
+# docker-compose para DESARROLLO LOCAL / referencia.
+# En Coolify, backend, frontend y postgres se despliegan como recursos
+# independientes (ver README.md), pero este archivo sirve para levantar
+# todo el stack de un jalón en tu máquina o servidor de pruebas.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: conteo
+      POSTGRES_PASSWORD: conteo
+      POSTGRES_DB: conteo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U conteo']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://conteo:conteo@postgres:5432/conteo?schema=public
+      JWT_ACCESS_SECRET: dev-access-secret-cambiar
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: dev-refresh-secret-cambiar
+      JWT_REFRESH_EXPIRES_IN: 30d
+      CORS_ORIGIN: http://localhost:5173
+      PORT: 3000
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:3000/api
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '5173:80'
+
+volumes:
+  postgres_data:
