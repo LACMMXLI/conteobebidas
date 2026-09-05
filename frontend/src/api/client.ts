@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { useAuthStore } from '../store/authStore';
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://yqzz1xa7log8gdjzso8gkiyw.fatboymexicali.com/api',
 });
 
 api.interceptors.request.use((config) => {
