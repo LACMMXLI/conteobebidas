@@ -9,8 +9,10 @@ import { BranchesModule } from './branches/branches.module';
 import { ProductsModule } from './products/products.module';
 import { CountsModule } from './counts/counts.module';
 import { AuditModule } from './audit/audit.module';
+import { AppController } from './app.controller';
 
 @Module({
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot({ throttlers: [{ ttl: 60_000, limit: 120 }] }),
